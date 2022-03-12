@@ -25,4 +25,15 @@ contract Lottery {
         require(msg.sender == owner);
         return address(this).balance;
     }
+
+    function getRandom() public view returns (uint) {
+        // Get a real random num: https://docs.chain.link/docs/get-a-random-number/
+        bytes32 random = keccak256(abi.encodePacked(
+            // Current block difficulty
+            block.difficulty,
+            block.timestamp,
+            players.length
+            ));
+        return uint(random);
+    }
 }
