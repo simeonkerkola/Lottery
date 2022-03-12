@@ -4,14 +4,14 @@ pragma solidity >=0.5.0 <0.9.0;
 
 contract Lottery {
     address payable[] public players;
-    address immutable public owner;
+    address payable immutable public owner;
 
     constructor() {
-        owner = msg.sender;
+        owner = payable(msg.sender);
     }
 
     receive() external payable {
-
+        require(msg.sender != owner);
         // User must send 0.1ETH min, 100000000000000000 wei
         // Require doesn't consume gas because there's no code before it
         require(msg.value == 0.1 ether);
@@ -45,6 +45,11 @@ contract Lottery {
 
         uint index = r % players.length;
         winner = players[index];
+
+        // Transfer 10% to the owner ;)
+        owner.transfer(getBalance() / 10);
+
+        // Transfer the rest of the balance to the winner
         winner.transfer(getBalance());
         reset();
     }
