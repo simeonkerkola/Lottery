@@ -28,12 +28,23 @@ contract Lottery {
 
     function getRandom() public view returns (uint) {
         // Get a real random num: https://docs.chain.link/docs/get-a-random-number/
-        bytes32 random = keccak256(abi.encodePacked(
+        return uint(keccak256(abi.encodePacked(
             // Current block difficulty
             block.difficulty,
             block.timestamp,
             players.length
-            ));
-        return uint(random);
+            )));
+    }
+
+    function pickWinner() public {
+        require(msg.sender == owner);
+        require(players.length >= 3);
+
+        uint r = getRandom();
+        address payable winner;
+
+        uint index = r % players.length;
+        winner = players[index];
+        winner.transfer(getBalance());
     }
 }
