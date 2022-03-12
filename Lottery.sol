@@ -46,5 +46,12 @@ contract Lottery {
         uint index = r % players.length;
         winner = players[index];
         winner.transfer(getBalance());
+        reset();
+    }
+
+    function reset() public {
+        require(msg.sender == owner);
+        // (0) size of the new dynamic array
+        players = new address payable[](0);
     }
 }
