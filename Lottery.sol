@@ -5,9 +5,15 @@ pragma solidity >=0.5.0 <0.9.0;
 contract Lottery {
   address payable[] public players;
   address payable public immutable owner;
+  uint256 public playersCount;
+  uint256 public immutable minPlayers;
+  address[] public winners;
+  uint256 public winnersCount;
 
   constructor() {
     owner = payable(msg.sender);
+    playersCount = 0;
+    minPlayers = 3;
   }
 
   receive() external payable {
@@ -18,6 +24,7 @@ contract Lottery {
 
     // Convert plain address to payable one
     players.push(payable(msg.sender));
+    playersCount++;
   }
 
   function getBalance() public view returns (uint256) {
@@ -43,7 +50,7 @@ contract Lottery {
 
   function pickWinner() public {
     require(msg.sender == owner);
-    require(players.length >= 3);
+    require(players.length >= minPlayers);
 
     uint256 r = getRandom();
     address payable winner;
@@ -56,6 +63,8 @@ contract Lottery {
 
     // Transfer the rest of the balance to the winner
     winner.transfer(getBalance());
+    winners.push(winner);
+    winnersCount++;
     reset();
   }
 
@@ -63,5 +72,6 @@ contract Lottery {
     require(msg.sender == owner);
     // (0) size of the new dynamic array
     players = new address payable[](0);
+    playersCount = 0;
   }
 }
